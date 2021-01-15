@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">WifiRobotController</string>
+    <string name="title_activity_drive">DriveActivity</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
+    <string name="humidityValue">Humidity : %1$s %%</string>  <!--  double percent for escape format specifier -->
+    <string name="altitudeValue">Altitude : %1$s m</string>
+    <string name="pressureValue">Pressure : %1$s hPa</string>
+    <string name="temperatureValue">Temperature: %1$s °C</string>
+    <string name="humidity">Humidity : </string>
+    <string name="altitude">Altitude : </string>
+    <string name="pressure">Pressure : </string>
+    <string name="temperature">Temperature: </string>
+</resources>

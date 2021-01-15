@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SpeedControlActivity"
+    android:padding="16dp">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get Sensor Data"
+        android:id="@+id/getSensorData"
+        android:layout_alignParentEnd="false">
+
+    </Button>
+
+    <TextView
+        android:id="@+id/txtTemperature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/getSensorData"
+        android:layout_alignStart="@+id/getSensorData"
+        android:text="@string/temperature"/>
+
+    <TextView
+        android:id="@+id/txtPressure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/txtTemperature"
+        android:layout_alignStart="@+id/getSensorData"
+        android:text="@string/pressure"/>
+
+    <TextView
+        android:id="@+id/txtAltitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/txtPressure"
+        android:layout_alignStart="@+id/getSensorData"
+        android:text="@string/altitude"/>
+
+    <TextView
+        android:id="@+id/txtHumidity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/txtAltitude"
+        android:layout_alignStart="@+id/getSensorData"
+        android:text="@string/humidity"/>
+
+
+
+    <io.github.controlwear.virtual.joystick.android.JoystickView
+        xmlns:custom="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/joystickView_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="96dp"
+        custom:JV_buttonSizeRatio="25%"
+        custom:JV_borderWidth="8dp"
+        custom:JV_backgroundColor="#d6d6d6"
+        custom:JV_borderColor="#343536"
+        custom:JV_buttonColor="#343536"/>
+
+</RelativeLayout>
