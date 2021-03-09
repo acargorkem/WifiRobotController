@@ -7,21 +7,13 @@
     tools:context=".SpeedControlActivity"
     android:padding="16dp">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Get Sensor Data"
-        android:id="@+id/getSensorData"
-        android:layout_alignParentEnd="false">
 
-    </Button>
 
     <TextView
         android:id="@+id/txtTemperature"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/getSensorData"
-        android:layout_alignStart="@+id/getSensorData"
+        android:layout_alignParentEnd="true"
         android:text="@string/temperature"/>
 
     <TextView
@@ -30,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/txtTemperature"
-        android:layout_alignStart="@+id/getSensorData"
+        android:layout_alignStart="@+id/txtTemperature"
         android:text="@string/pressure"/>
 
     <TextView
@@ -39,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/txtPressure"
-        android:layout_alignStart="@+id/getSensorData"
+        android:layout_alignStart="@+id/txtTemperature"
         android:text="@string/altitude"/>
 
     <TextView
@@ -48,10 +40,31 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/txtAltitude"
-        android:layout_alignStart="@+id/getSensorData"
+        android:layout_alignStart="@+id/txtTemperature"
         android:text="@string/humidity"/>
 
+    <Button
+        android:id="@+id/button_camera_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Stop"/>
 
+    <Button
+        android:id="@+id/button_camera_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/mJpeg_Stream"
+        android:layout_alignParentBottom="true"
+        android:text="Start"/>
+
+    <com.acargorkem.wifirobotcontroller.MJpegStreamView
+        android:id="@+id/mJpeg_Stream"
+        android:layout_width="328dp"
+        android:layout_height="216dp"
+        android:background="@android:color/black"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentBottom="true" />
 
     <io.github.controlwear.virtual.joystick.android.JoystickView
         xmlns:custom="http://schemas.android.com/apk/res-auto"

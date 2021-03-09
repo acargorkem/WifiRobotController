@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,13 +27,15 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
 public class SpeedControlActivity extends AppCompatActivity {
 
     private String url = "http://192.168.1.150"; //esp32 local ip
-    private String temperature , pressure , altitude , humidity;
+    private String temperature, pressure, altitude, humidity;
 
     private TextView mTextViewTemperature;
     private TextView mTextViewPressure;
@@ -41,12 +44,15 @@ public class SpeedControlActivity extends AppCompatActivity {
 
     private RequestQueue requestQueue;
 
+    private MJpegStreamView mJpegStreamView;
+
 
     private String[] result;
     private String[] speedArray;
     double leftSpeed, rightSpeed;
     int angleTemp = 0, strengthTemp = 0;
-
+    private Timer timer = new Timer();
+    private Button stopButton, startButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,42 +64,24 @@ public class SpeedControlActivity extends AppCompatActivity {
         mTextViewPressure = findViewById(R.id.txtPressure);
         mTextViewAltitude = findViewById(R.id.txtAltitude);
         mTextViewHumidity = findViewById(R.id.txtHumidity);
-        Button btnGetSensor = findViewById(R.id.getSensorData);
 
-        //get sensor data listener
-        btnGetSensor.setOnClickListener(new View.OnClickListener() {
+        stopButton = findViewById(R.id.button_camera_stop);
+
+        startButton = findViewById(R.id.button_camera_start);
+
+        mJpegStreamView = findViewById(R.id.mJpeg_Stream);
+
+        mJpegStreamView.setUrl("http://192.168.1.150/picture");
+        mJpegStreamView.setInterval(200);
+
+
+        // sensor data listener
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
-            public void onClick(View v) {
-                if (requestQueue == null) {
-                    requestQueue = Volley.newRequestQueue(SpeedControlActivity.this);
-                }
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                        (Request.Method.GET, url + "/bme280", null, new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-
-                                try {
-                                    temperature = response.getString("temperature");
-                                    pressure = response.getString("pressure");
-                                    altitude = response.getString("altitude");
-                                    humidity = response.getString("humidity");
-                                    mTextViewTemperature.setText(getString(R.string.temperatureValue,temperature));
-                                    mTextViewPressure.setText(getString(R.string.pressureValue,pressure));
-                                    mTextViewAltitude.setText(getString(R.string.altitudeValue,altitude));
-                                    mTextViewHumidity.setText(getString(R.string.humidityValue,humidity));
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.e("getJSONObjectRequest", error.toString());
-                            }
-                        });
-                requestQueue.add(jsonObjectRequest);
+            public void run() {
+                sensorRequest();
             }
-        });
+        }, 0, 60 * 1000);// 1 minute interval
 
         // joystick view listener
         final JoystickView joystickRight = findViewById(R.id.joystickView_right);
@@ -113,8 +101,53 @@ public class SpeedControlActivity extends AppCompatActivity {
                 }
 
             }
-        },500);
+        }, 500); // 500 ms interval
 
+        stopButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mJpegStreamView.stop();
+            }
+        });
+
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mJpegStreamView.start();
+            }
+        });
+    }
+
+
+    private void sensorRequest() {
+        if (requestQueue == null) {
+            requestQueue = Volley.newRequestQueue(SpeedControlActivity.this);
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                (Request.Method.GET, url + "/bme280", null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        try {
+                            temperature = response.getString("temperature");
+                            pressure = response.getString("pressure");
+                            altitude = response.getString("altitude");
+                            humidity = response.getString("humidity");
+                            mTextViewTemperature.setText(getString(R.string.temperatureValue, temperature));
+                            mTextViewPressure.setText(getString(R.string.pressureValue, pressure));
+                            mTextViewAltitude.setText(getString(R.string.altitudeValue, altitude));
+                            mTextViewHumidity.setText(getString(R.string.humidityValue, humidity));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("getJSONObjectRequest", error.toString());
+                    }
+                });
+        requestQueue.add(jsonObjectRequest);
     }
 
     private void postRequest(String path, final String... myParameters) {
