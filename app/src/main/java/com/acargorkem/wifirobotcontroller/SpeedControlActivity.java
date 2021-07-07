@@ -4,15 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -21,6 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.longdo.mjpegviewer.MjpegView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,7 +31,7 @@ import io.github.controlwear.virtual.joystick.android.JoystickView;
 
 public class SpeedControlActivity extends AppCompatActivity {
 
-    private String url = "http://192.168.1.150"; //esp32 local ip
+    private String BASE_URL = "http://192.168.1.160:5000/"; //wifi device ip
     private String temperature, pressure, altitude, humidity;
 
     private TextView mTextViewTemperature;
@@ -44,15 +41,13 @@ public class SpeedControlActivity extends AppCompatActivity {
 
     private RequestQueue requestQueue;
 
-    private MJpegStreamView mJpegStreamView;
-
+    private MjpegView viewer;
 
     private String[] result;
     private String[] speedArray;
     double leftSpeed, rightSpeed;
     int angleTemp = 0, strengthTemp = 0;
     private Timer timer = new Timer();
-    private Button stopButton, startButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,15 +60,13 @@ public class SpeedControlActivity extends AppCompatActivity {
         mTextViewAltitude = findViewById(R.id.txtAltitude);
         mTextViewHumidity = findViewById(R.id.txtHumidity);
 
-        stopButton = findViewById(R.id.button_camera_stop);
+        Button stopButton = findViewById(R.id.button_camera_stop);
+        Button startButton = findViewById(R.id.button_camera_start);
 
-        startButton = findViewById(R.id.button_camera_start);
-
-        mJpegStreamView = findViewById(R.id.mJpeg_Stream);
-
-        mJpegStreamView.setUrl("http://192.168.1.150/picture");
-        mJpegStreamView.setInterval(200);
-
+        viewer = findViewById(R.id.mJpeg_Stream);
+        viewer.setMode(MjpegView.MODE_FIT_WIDTH);
+        viewer.setAdjustHeight(true);
+        viewer.setUrl(BASE_URL + "video_feed");
 
         // sensor data listener
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -89,15 +82,17 @@ public class SpeedControlActivity extends AppCompatActivity {
             @SuppressLint("DefaultLocale")
             @Override
             public void onMove(int angle, int strength) {
-
                 if (angle != angleTemp || strength != strengthTemp) {
-                    angleTemp = angle;
-                    strengthTemp = strength;
-                    speedArray = getSpeed(angle, strength);
-                    postRequest("/drive",
-                            "angle=" + angleTemp,
-                            "leftSpeed=" + speedArray[0],
-                            "rightSpeed=" + speedArray[1]);
+                    if (strength > 10 || strength == 0) {
+                        angleTemp = angle;
+                        strengthTemp = strength;
+                        speedArray = getSpeed(angle, strength);
+                        postRequest("drive",
+                                "angle=" + angleTemp,
+                                "leftSpeed=" + speedArray[0],
+                                "rightSpeed=" + speedArray[1]);
+                    }
+
                 }
 
             }
@@ -106,25 +101,23 @@ public class SpeedControlActivity extends AppCompatActivity {
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mJpegStreamView.stop();
+                viewer.stopStream();
             }
         });
-
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mJpegStreamView.start();
+                viewer.startStream();
             }
         });
     }
-
 
     private void sensorRequest() {
         if (requestQueue == null) {
             requestQueue = Volley.newRequestQueue(SpeedControlActivity.this);
         }
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, url + "/bme280", null, new Response.Listener<JSONObject>() {
+                (Request.Method.GET, BASE_URL + "bme280", null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
 
@@ -155,7 +148,7 @@ public class SpeedControlActivity extends AppCompatActivity {
             requestQueue = Volley.newRequestQueue(SpeedControlActivity.this);
         }
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url + path, new Response.Listener<String>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, BASE_URL + path, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.i("postRequest", response);
@@ -163,9 +156,6 @@ public class SpeedControlActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
-                Toast.makeText(SpeedControlActivity.this, error.toString(),
-                        Toast.LENGTH_SHORT).show();
                 Log.e("postRequest", error.toString());
             }
         }) {
@@ -193,30 +183,11 @@ public class SpeedControlActivity extends AppCompatActivity {
     }
 
 
-    //convert angle,strength to leftSpeed,rightSpeed
+    //convert angle&strength to leftSpeed&rightSpeed
     private String[] getSpeed(double angle, double strength) {
 
-        if (175 <= angle && angle <= 185) {
-            leftSpeed = strength;
-            rightSpeed = strength;
-        }
-        //forward
-        else if (85 <= angle && angle <= 95) {
-            leftSpeed = strength;
-            rightSpeed = strength;
-        }
-        //right
-        else if ((0 <= angle && angle <= 5) || (355 <= angle && angle < 360)) {
-            leftSpeed = strength;
-            rightSpeed = strength;
-        }
-        //back
-        else if (265 <= angle && angle <= 275) {
-            leftSpeed = strength;
-            rightSpeed = strength;
-        }
         //forward diagonal
-        else if ((5 < angle && angle < 85) || (95 < angle && angle < 175)) {
+        if ((5 < angle && angle < 85) || (95 < angle && angle < 175)) {
             leftSpeed = ((180 - angle) * strength) / 180;
             rightSpeed = (angle / 180) * strength;
         }
@@ -225,11 +196,10 @@ public class SpeedControlActivity extends AppCompatActivity {
             leftSpeed = ((angle - 180) * strength) / 180;
             rightSpeed = ((360 - angle) * strength) / 180;
         } else {
-            leftSpeed = 0;
-            rightSpeed = 0;
+            leftSpeed = strength;
+            rightSpeed = strength;
         }
-        leftSpeed = leftSpeed * 255 / 100;
-        rightSpeed = rightSpeed * 255 / 100;
+
         return new String[]{Double.toString(leftSpeed), Double.toString(rightSpeed)};
     }
 

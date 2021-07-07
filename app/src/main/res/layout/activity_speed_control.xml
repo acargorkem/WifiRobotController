@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SpeedControlActivity"
-    android:padding="16dp">
-
+    android:padding="16dp"
+    tools:context=".SpeedControlActivity">
 
 
     <TextView
@@ -14,70 +12,70 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:text="@string/temperature"/>
+        android:layout_marginEnd="15dp"
+        android:text="@string/temperature" />
 
     <TextView
         android:id="@+id/txtPressure"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_below="@+id/txtTemperature"
         android:layout_alignStart="@+id/txtTemperature"
-        android:text="@string/pressure"/>
+        android:layout_alignParentEnd="true"
+        android:text="@string/pressure" />
 
     <TextView
         android:id="@+id/txtAltitude"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_below="@+id/txtPressure"
         android:layout_alignStart="@+id/txtTemperature"
-        android:text="@string/altitude"/>
+        android:layout_alignParentEnd="true"
+        android:text="@string/altitude" />
 
     <TextView
         android:id="@+id/txtHumidity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_below="@+id/txtAltitude"
         android:layout_alignStart="@+id/txtTemperature"
-        android:text="@string/humidity"/>
-
-    <Button
-        android:id="@+id/button_camera_start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="Stop"/>
+        android:layout_alignParentEnd="true"
+        android:text="@string/humidity" />
 
     <Button
         android:id="@+id/button_camera_stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/mJpeg_Stream"
         android:layout_alignParentBottom="true"
-        android:text="Start"/>
+        android:text="@string/stop" />
 
-    <com.acargorkem.wifirobotcontroller.MJpegStreamView
+    <Button
+        android:id="@+id/button_camera_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/mJpeg_Stream"
+        android:layout_alignParentBottom="true"
+        android:text="@string/start" />
+
+    <com.longdo.mjpegviewer.MjpegView
         android:id="@+id/mJpeg_Stream"
         android:layout_width="328dp"
-        android:layout_height="216dp"
-        android:background="@android:color/black"
+        android:layout_height="match_parent"
         android:layout_alignParentEnd="false"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/black" />
 
-    <io.github.controlwear.virtual.joystick.android.JoystickView
-        xmlns:custom="http://schemas.android.com/apk/res-auto"
+    <io.github.controlwear.virtual.joystick.android.JoystickView xmlns:custom="http://schemas.android.com/apk/res-auto"
         android:id="@+id/joystickView_right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
         android:layout_marginTop="96dp"
-        custom:JV_buttonSizeRatio="25%"
-        custom:JV_borderWidth="8dp"
         custom:JV_backgroundColor="#d6d6d6"
         custom:JV_borderColor="#343536"
-        custom:JV_buttonColor="#343536"/>
+        custom:JV_borderWidth="8dp"
+        custom:JV_buttonColor="#343536"
+        custom:JV_buttonSizeRatio="25%" />
 
 </RelativeLayout>

@@ -10,4 +10,6 @@
     <string name="pressure">Pressure : </string>
     <string name="temperature">Temperature: </string>
     <string name="stop_receiving_sensor_data">Stop receiving sensor data</string>
+    <string name="stop">Stop</string>
+    <string name="start">Start</string>
 </resources>
